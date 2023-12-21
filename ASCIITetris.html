@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<title>
+			ASCII Tetris
+		</title>
+
+		<style>
+			body {
+				font-family: menlo;
+			}
+
+			#tetrisBoard {
+				white-space: pre-wrap;
+				display: inline;
+			}
+
+			#holdPieceBlock {
+				white-space: pre-wrap;
+			}
+
+			#gameInfo {
+				white-space: pre-wrap;
+			}
+
+			.cyan {
+				color: turquoise;
+			}
+
+			.blue {
+				color: blue;
+			}
+
+			.orange {
+				color: orange;
+			}
+
+			.yellow {
+				color: #8B8000;
+			}
+
+			.green {
+				color: green;
+			}
+
+			.red {
+				color: red;
+			}
+
+			.magenta {
+				color: magenta;
+			}
+
+			bold {
+				opacity: 0.5;
+			}
+		</style>
+	</head>
+
+	<body>
+		<p id="tetrisBoard"></p>
+		<span id="holdPieceBlock"></span>
+		<span id="gameInfo"></span>
+		<br>
+		<label> Show Ghost:<input type="checkbox" checked id="showGhostCheckbox"></label>
+		<br>
+		<button id="resetButton">Reset</button>
+		<br> <br>
+		Try Pressing: <br>
+		Ctrl + Shift + I (Windows) <br>
+		command + option + i (Mac)
+	</body>
+
+	<script src="ASCIITetris.js"></script>
+</html>
