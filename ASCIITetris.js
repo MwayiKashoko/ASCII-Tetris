@@ -865,7 +865,7 @@ Lines: ${lines}`;
 
 	const draw = () => {
 		updatePiece();
-		//updateBoard();
+		updateBoard();
         drawGameInfo();
         findGhost();
 	}
@@ -873,11 +873,9 @@ Lines: ${lines}`;
 	const update = () => {
 		let frame = requestAnimationFrame(update);
 
-		if (level-1 < speeds.length && frame%speeds[level-1]-1 == 0) {
+		if ((level-1 < speeds.length && frame%speeds[level-1]-1 == 0) || level-1 >= speeds.length) {
 			draw();
-		} else if (level-1 >= speeds.length) {
-            draw();
-        }
+		}
 	};
 
 	document.addEventListener("keydown", function(key) {
