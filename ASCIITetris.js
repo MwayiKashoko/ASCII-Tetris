@@ -777,8 +777,8 @@
 
         HTMLBoard.innerHTML = HTMLBoard.innerHTML.replace(/\|/g, `<strong>|</strong>`).replace(/@/g, `<strong class="${colors[currentPos]}">@</strong>`);
 
-        console.clear();
-        console.log(JSON.parse(JSON.stringify(HTMLBoard.textContent)));
+        //console.clear();
+        //console.log(JSON.parse(JSON.stringify(HTMLBoard.textContent)));
     }
 
     const updateBoard = () => {
@@ -794,9 +794,8 @@
             arr[i].forEach((block, j) => {
                 if (currentRow + i < rows) {
                     if (arr[i][j] != 0) {
-                        if (board[currentRow+i][currentCol+j] != 0) {
+                        if (board[currentRow+i][currentCol+j] != 0 && !stopGame) {
                             stopGame = true;
-                            HTMLBoard.innerHTML = "GAME OVER!";
                         }
 
                         board[currentRow+i][currentCol+j] = arr[i][j];
@@ -923,7 +922,7 @@ Lines: ${lines}`;
         updatePiece();
         updateBoard();
 
-        if (score > highScore) {
+        if (score >= highScore) {
             highScore = score;
         }
 
@@ -937,7 +936,11 @@ Lines: ${lines}`;
         playMusic();
 
         if (stopGame) {
-            HTMLBoard.innerHTML = "GAME OVER";
+            if (score >= highScore) {
+                HTMLBoard.innerHTML = "NEW HIGH SCORE!";
+            } else {
+                HTMLBoard.innerHTML = "GAME OVER!";
+            }
         } else if ((level-1 < speeds.length && frame%speeds[level-1]-1 == 0) || level-1 >= speeds.length) {
             draw();
         }
@@ -997,7 +1000,7 @@ Lines: ${lines}`;
             updateBoard();
             findGhost();
 
-            if (score > highScore) {
+            if (score >= highScore) {
                 highScore = score;
             }
 
