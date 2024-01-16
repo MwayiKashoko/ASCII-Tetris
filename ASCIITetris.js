@@ -1,93 +1,97 @@
 "use strict";
 (function() {
-	const random = (min, max) => {
-		return Math.floor(Math.random() * (max-min+1)) + min;
-	};
+    const random = (min, max) => {
+        return Math.floor(Math.random() * (max-min+1)) + min;
+    };
 
-	const HTMLBoard = document.getElementById("tetrisBoard");
-	const rows = 20;
-	const cols = 10;
+    const HTMLBoard = document.getElementById("tetrisBoard");
+    const rows = 20;
+    const cols = 10;
 
-	const HTMLHold = document.getElementById("holdPieceBlock");
-	const holdRows = 5;
-	const holdCols = 5;
+    const HTMLHold = document.getElementById("holdPieceBlock");
+    const holdRows = 5;
+    const holdCols = 5;
 
     const HTMLgameInfo = document.getElementById("gameInfo");
     const HTMLshowGhost = document.getElementById("showGhostCheckbox");
     const HTMLresetButton = document.getElementById("resetButton");
+    const HTMLmusicSelect = document.getElementById("musicSelect");
 
     let showGhost = HTMLshowGhost.checked;
+
+    let stopGame = false;
 
     HTMLshowGhost.addEventListener("change", () => {
         showGhost = HTMLshowGhost.checked;
     });
 
-	const tetrominoes = [
-		//I Piece
-		[
-			[0, 0, 0, 0],
-			[1, 1, 1, 1],
-			[0, 0, 0, 0],
-			[0, 0, 0, 0]
-		],
+    const tetrominoes = [
+        //I Piece
+        [
+            [0, 0, 0, 0],
+            [1, 1, 1, 1],
+            [0, 0, 0, 0],
+            [0, 0, 0, 0]
+        ],
 
-		//J Piece
-		[
-			[2, 0, 0],
-			[2, 2, 2],
-			[0, 0, 0]
-		],
+        //J Piece
+        [
+            [2, 0, 0],
+            [2, 2, 2],
+            [0, 0, 0]
+        ],
 
-		//L Piece
-		[
-			[0, 0, 3],
-			[3, 3, 3],
-			[0, 0, 0]
-		],
+        //L Piece
+        [
+            [0, 0, 3],
+            [3, 3, 3],
+            [0, 0, 0]
+        ],
 
-		//O Piece
-		[
-			[4, 4],
-			[4, 4]
-		],
+        //O Piece
+        [
+            [4, 4],
+            [4, 4]
+        ],
 
-		//S Piece
-		[
-			[0, 5, 5],
-			[5, 5, 0],
-			[0, 0, 0]
-		],
+        //S Piece
+        [
+            [0, 5, 5],
+            [5, 5, 0],
+            [0, 0, 0]
+        ],
 
-		//Z Piece
+        //Z Piece
 
-		[
-			[6, 6, 0],
-			[0, 6, 6],
-			[0, 0, 0]
-		],
+        [
+            [6, 6, 0],
+            [0, 6, 6],
+            [0, 0, 0]
+        ],
 
-		//T Piece
-		[
-			[0, 7, 0],
-			[7, 7, 7],
-			[0, 0, 0]
-		],
-	];
+        //T Piece
+        [
+            [0, 7, 0],
+            [7, 7, 7],
+            [0, 0, 0]
+        ],
+    ];
 
     const colors = ["cyan", "blue", "orange", "yellow", "green", "red", "magenta"];
 
-	let level = 1;
-	let score = 0;
-	let lines = 0;
+    let level = 1;
+    let score = 0;
+    let highScore = 0;
+    let lines = 0;
 
     const speeds = [60, 53, 48, 43, 38, 33, 28, 23, 18, 13, 8, 6, 5, 5, 5, 4, 4, 4, 3, 3, 3, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2];
 
-	let currentPos = random(0, tetrominoes.length-1);
-	//currentPos = 0;
-	let currentTetromino = JSON.parse(JSON.stringify(tetrominoes[currentPos]));
-	let currentRow = -1;
-	//let currentRow = 0;
-	let currentCol = cols/2-Math.ceil(currentTetromino[0].length/2);
+    let currentPos = random(0, tetrominoes.length-1);
+    //currentPos = 0;
+    let currentTetromino = JSON.parse(JSON.stringify(tetrominoes[currentPos]));
+    let currentRow = -1;
+    //let currentRow = 0;
+    let currentCol = cols/2-Math.ceil(currentTetromino[0].length/2);
 
     let bag7a = [];
     let bag7b = [];
@@ -114,27 +118,27 @@
         currentPiece.push(JSON.parse(JSON.stringify(tetrominoes[bag7a[i]])));
     }
 
-	let canHold = true;
+    let canHold = true;
 
-	let holdPiece = [];
+    let holdPiece = [];
     let holdPos = 0;
 
-	let startRow = 0;
-	let endRow = 0;
-	let startCol = 0;
-	let endCol = 0;
+    let startRow = 0;
+    let endRow = 0;
+    let startCol = 0;
+    let endCol = 0;
 
-	//let zPressed
-	let xPressed = false;
-	//let shiftPressed
+    //let zPressed
+    let xPressed = false;
+    //let shiftPressed
 
-	let rotations = 0;
+    let rotations = 0;
 
     const look = (str, substr) => {
         return isNaN(str) && str.indexOf(substr) > -1;
     }
 
-	const isValid = direction => {
+    const isValid = direction => {
         if (direction == "left") {
             let firstCol = [];
 
@@ -169,7 +173,7 @@
         }
 
         return lastRow.every(block => block == 0 || currentRow+endingPosition < board.length) && 
-        	currentTetromino.every((row, i) => row.every((block, j) => block == 0 || (i+currentRow+1 < board.length && (board[i+currentRow+1][j+currentCol] == 0 || look(board[i+currentRow+1][j+currentCol], "#")))));
+            currentTetromino.every((row, i) => row.every((block, j) => block == 0 || (i+currentRow+1 < board.length && (board[i+currentRow+1][j+currentCol] == 0 || look(board[i+currentRow+1][j+currentCol], "#")))));
     }
 
     const translatePiece = (col, row) => {
@@ -178,9 +182,9 @@
     }
 
     const rotatePiece = direction => {
-    	let copyPiece = [];
+        let copyPiece = [];
 
-    	for (let i = 0; i < currentTetromino.length; i++) {
+        for (let i = 0; i < currentTetromino.length; i++) {
             copyPiece.push([]);
 
             for (let j = 0; j < currentTetromino[i].length; j++) {
@@ -234,13 +238,13 @@
         }*/
 
         currentTetromino.forEach((row, i, arr) => {
-        	arr[i].forEach((block, j) => {
-        		if (block != 0) {
-        			if (!wallKickCondition && board[i+currentRow][j+currentCol] != 0) {
+            arr[i].forEach((block, j) => {
+                if (block != 0) {
+                    if (!wallKickCondition && board[i+currentRow][j+currentCol] != 0) {
                         wallKickCondition = true;
                     }
-        		}
-        	});
+                }
+            });
         });
 
         let wallKickCase = 1;
@@ -472,62 +476,66 @@
         }
 
         if (wallKickCase > 4) {
-        	currentTetromino = copyPiece;
+            currentTetromino = copyPiece;
             rotations -= sign;
         }
 
         findBounds();
+
+        if (currentRow < 0) {
+            currentRow = 0;
+        }
     }
 
-	const findBounds = () => {
-		let foundStartRow = false;
-		let foundStartCol = false;
+    const findBounds = () => {
+        let foundStartRow = false;
+        let foundStartCol = false;
 
-		currentTetromino.forEach((row, i, arr) => {
-			if (row.some((num) => num != 0)) {
-				if (!foundStartRow) {
-					startRow = i;
+        currentTetromino.forEach((row, i, arr) => {
+            if (row.some((num) => num != 0)) {
+                if (!foundStartRow) {
+                    startRow = i;
 
-					foundStartRow = true;
-				}
+                    foundStartRow = true;
+                }
 
-				endRow = i;
-			}
-		});
+                endRow = i;
+            }
+        });
 
-		currentTetromino.forEach((row, i, arr) => {
-			for (let j = 0; j < arr.length; j++) {
-				if (currentTetromino[j][i] != 0) {
-					if (!foundStartCol) {
-						startCol = i;
+        currentTetromino.forEach((row, i, arr) => {
+            for (let j = 0; j < arr.length; j++) {
+                if (currentTetromino[j][i] != 0) {
+                    if (!foundStartCol) {
+                        startCol = i;
 
-						foundStartCol = true;
-					}
+                        foundStartCol = true;
+                    }
 
-					endCol = i;
-				}
-			}
-		});
-	}
+                    endCol = i;
+                }
+            }
+        });
+    }
 
-	findBounds();
+    findBounds();
 
-	const createBoard = (rows, cols) => {
-		const board = [];
+    const createBoard = (rows, cols) => {
+        const board = [];
 
-		for (let i = 0; i < rows; i++) {
-			board.push([]);
+        for (let i = 0; i < rows; i++) {
+            board.push([]);
 
-			for (let j = 0; j < cols; j++) {
-				board[i].push(0);
-			}
-		}
+            for (let j = 0; j < cols; j++) {
+                board[i].push(0);
+            }
+        }
 
-		return board;
-	};
+        return board;
+    };
 
-	const board = createBoard(rows, cols);
-	const holdBoard = createBoard(holdRows, holdCols);
+    const board = createBoard(rows, cols);
+    const holdBoard = createBoard(holdRows, holdCols);
 
     const dropBoard = row => {
         for (let i = row; i >= 1; i--) {
@@ -567,7 +575,7 @@
         level = Math.floor(lines/10)+1;
     }
 
-	const nextPiece = () => {
+    const nextPiece = () => {
         let thePiece = bag7a.pop();
 
         if (bag7a.length == 0) {
@@ -591,15 +599,15 @@
             }
         }
 
-		currentTetromino = JSON.parse(JSON.stringify(tetrominoes[thePiece]));
+        currentTetromino = JSON.parse(JSON.stringify(tetrominoes[thePiece]));
         currentPos = thePiece;
-		currentRow = 0;
-		currentCol = cols/2-Math.ceil(currentTetromino[0].length/2);
-			
-		findBounds();
+        currentRow = 0;
+        currentCol = cols/2-Math.ceil(currentTetromino[0].length/2);
+            
+        findBounds();
 
-		canHold = true;
-	};
+        canHold = true;
+    };
 
     const findGhost = drop => {
         let lastPosition = currentRow;
@@ -690,12 +698,12 @@
         }
     }
 
-	const updatePiece = () => {
-		let timeToBePlaced = currentRow+endRow+1 >= rows;
+    const updatePiece = () => {
+        let timeToBePlaced = currentRow+endRow+1 >= rows;
 
-		currentTetromino[endRow].forEach((block, i, arr) => {
-			timeToBePlaced ||= block != 0 && currentRow+endRow+1 < rows && board[currentRow+endRow+1][i+currentCol] != 0 && !look(board[currentRow+endRow+1][i+currentCol], "#");
-		});
+        currentTetromino[endRow].forEach((block, i, arr) => {
+            timeToBePlaced ||= block != 0 && currentRow+endRow+1 < rows && board[currentRow+endRow+1][i+currentCol] != 0 && !look(board[currentRow+endRow+1][i+currentCol], "#");
+        });
 
         currentTetromino.forEach((row, i, arr) => {
             if (i < currentTetromino.length-1) {
@@ -705,67 +713,67 @@
             }
         });
 
-		if (!timeToBePlaced) {
-			currentRow++;
-		} else {
-			currentTetromino.forEach((row, i, arr) => {
-				arr[i].forEach((block, j) => {
-					if (currentRow + i < rows && currentRow + i >= 0&& arr[i][j] >= 1 && arr[i][j] <= 7) {
-						board[currentRow+i][currentCol+j] = "P" + arr[i][j];
-					}
-				});
-			});
+        if (!timeToBePlaced) {
+            currentRow++;
+        } else {
+            currentTetromino.forEach((row, i, arr) => {
+                arr[i].forEach((block, j) => {
+                    if (currentRow + i < rows && currentRow + i >= 0&& arr[i][j] >= 1 && arr[i][j] <= 7) {
+                        board[currentRow+i][currentCol+j] = "P" + arr[i][j];
+                    }
+                });
+            });
 
-			nextPiece();
-		}
-	}
+            nextPiece();
+        }
+    }
 
-	const drawBoard = () => {
+    const drawBoard = () => {
         HTMLBoard.innerHTML = "";
 
-		for (let i = 0; i < cols; i++) {
+        for (let i = 0; i < cols; i++) {
             HTMLBoard.innerHTML += " _";
-		}
+        }
 
-		for (let i = 0; i < rows; i++) {
+        for (let i = 0; i < rows; i++) {
             HTMLBoard.innerHTML += "\n|";
 
-			for (let j = 0; j < cols; j++) {
-				if (j < cols-1) {
-					if (board[i][j] == 0) {
+            for (let j = 0; j < cols; j++) {
+                if (j < cols-1) {
+                    if (board[i][j] == 0) {
                         HTMLBoard.innerHTML += "- ";
-					} else if (board[i][j] <= tetrominoes.length) {
+                    } else if (board[i][j] <= tetrominoes.length) {
                         HTMLBoard.innerHTML += "@ ";
-					} else if (look(board[i][j], "P")) {
+                    } else if (look(board[i][j], "P")) {
                         let text = colors[board[i][j][1]-1];
                         HTMLBoard.innerHTML += `<strong class="${text}">M </strong>`;
-					} else if (look(board[i][j], "#")) {
+                    } else if (look(board[i][j], "#")) {
                         let text = colors[board[i][j][1]-1];
                         HTMLBoard.innerHTML += `<bold class="${text}"># </bold>`;
                     }
-				} else {
-					if (board[i][j] == 0) {
+                } else {
+                    if (board[i][j] == 0) {
                         HTMLBoard.innerHTML += "-";
-					} else if (board[i][j] <= tetrominoes.length) {
+                    } else if (board[i][j] <= tetrominoes.length) {
                         HTMLBoard.innerHTML += "@";
-					} else if (look(board[i][j], "P")) {
+                    } else if (look(board[i][j], "P")) {
                         let text = colors[board[i][j][1]-1];
                         HTMLBoard.innerHTML += `<strong class="${text}">M</strong>`;
-					} else if (look(board[i][j], "#")) {
+                    } else if (look(board[i][j], "#")) {
                         let text = colors[board[i][j][1]-1];
                         HTMLBoard.innerHTML += `<bold class="${text}">#</bold>`;
                     }
-				}
-			}
+                }
+            }
 
             HTMLBoard.innerHTML += "|";
-		}
+        }
 
         HTMLBoard.innerHTML += "\n";
 
-		for (let i = 0; i < cols; i++) {
+        for (let i = 0; i < cols; i++) {
             HTMLBoard.innerHTML += " \u203E";
-		}
+        }
 
         HTMLBoard.innerHTML = HTMLBoard.innerHTML.replace(/\|/g, `<strong>|</strong>`).replace(/@/g, `<strong class="${colors[currentPos]}">@</strong>`);
 
@@ -773,166 +781,233 @@
         console.log(JSON.parse(JSON.stringify(HTMLBoard.textContent)));
     }
 
-	const updateBoard = () => {
-		board.forEach((row, i, arr) => {
-			arr[i].forEach((block, j) => {
-				if (!look(arr[i][j], "P")) {
-					arr[i][j] = 0;
-				}
-			});
-		});
+    const updateBoard = () => {
+        board.forEach((row, i, arr) => {
+            arr[i].forEach((block, j) => {
+                if (!look(arr[i][j], "P")) {
+                    arr[i][j] = 0;
+                }
+            });
+        });
 
-		currentTetromino.forEach((row, i, arr) => {
-			arr[i].forEach((block, j) => {
-				if (currentRow + i < rows) {
-					if (arr[i][j] != 0) {
-						board[currentRow+i][currentCol+j] = arr[i][j];
-					}
-				}
-			});
-		});
+        currentTetromino.forEach((row, i, arr) => {
+            arr[i].forEach((block, j) => {
+                if (currentRow + i < rows) {
+                    if (arr[i][j] != 0) {
+                        if (board[currentRow+i][currentCol+j] != 0) {
+                            stopGame = true;
+                            HTMLBoard.innerHTML = "GAME OVER!";
+                        }
+
+                        board[currentRow+i][currentCol+j] = arr[i][j];
+                    }
+                }
+            });
+        });
 
         drawBoard();
-	};
+    };
 
-	const drawHoldPiece = () => {
-		HTMLHold.textContent = "\nHold Piece\n";
+    const drawHoldPiece = () => {
+        HTMLHold.textContent = "\nHold Piece\n";
 
-		for (let i = 0; i < holdCols; i++) {
-			HTMLHold.textContent += " _";
-		}
+        for (let i = 0; i < holdCols; i++) {
+            HTMLHold.textContent += " _";
+        }
 
-		for (let i = 0; i < holdRows; i++) {
-			HTMLHold.textContent += "\n|";
+        for (let i = 0; i < holdRows; i++) {
+            HTMLHold.textContent += "\n|";
 
-			for (let j = 0; j < holdCols; j++) {
-				if (j < holdCols-1) {
-					if (holdBoard[i][j] == 0) {
-						HTMLHold.textContent += "- ";
-					} else if (holdBoard[i][j] <= tetrominoes.length) {
-						HTMLHold.textContent += "@ ";
-					}
-				} else {
-					if (holdBoard[i][j] == 0) {
-						HTMLHold.textContent += "-";
-					} else if (holdBoard[i][j] <= tetrominoes.length) {
-						HTMLHold.textContent += "@";
-					}
-				}
-			}
+            for (let j = 0; j < holdCols; j++) {
+                if (j < holdCols-1) {
+                    if (holdBoard[i][j] == 0) {
+                        HTMLHold.textContent += "- ";
+                    } else if (holdBoard[i][j] <= tetrominoes.length) {
+                        HTMLHold.textContent += "@ ";
+                    }
+                } else {
+                    if (holdBoard[i][j] == 0) {
+                        HTMLHold.textContent += "-";
+                    } else if (holdBoard[i][j] <= tetrominoes.length) {
+                        HTMLHold.textContent += "@";
+                    }
+                }
+            }
 
-			HTMLHold.textContent += "|";
-		}
+            HTMLHold.textContent += "|";
+        }
 
-		HTMLHold.textContent += "\n";
+        HTMLHold.textContent += "\n";
 
-		for (let i = 0; i < holdCols; i++) {
-			HTMLHold.textContent += " \u203E";
-		}
+        for (let i = 0; i < holdCols; i++) {
+            HTMLHold.textContent += " \u203E";
+        }
 
-		HTMLHold.innerHTML = HTMLHold.textContent.replace(/@/g, `<strong class="${colors[holdPos]}">@</strong>`);
-	};
+        HTMLHold.innerHTML = HTMLHold.textContent.replace(/@/g, `<strong class="${colors[holdPos]}">@</strong>`);
+    };
 
-	const updateHoldPiece = () => {
-		holdBoard.forEach((row, i, arr) => {
-			arr[i].forEach((block, j) => {
-				if (!look(arr[i][j], "P")) {
-					arr[i][j] = 0;
-				}
-			});
-		});
+    const updateHoldPiece = () => {
+        holdBoard.forEach((row, i, arr) => {
+            arr[i].forEach((block, j) => {
+                if (!look(arr[i][j], "P")) {
+                    arr[i][j] = 0;
+                }
+            });
+        });
 
-		holdPiece.forEach((row, i, arr) => {
-			arr[i].forEach((block, j) => {
-				if (arr[i][j] != 0) {
-					holdBoard[i+1][j+1] = arr[i][j];
-				}
-			});
-		});
+        holdPiece.forEach((row, i, arr) => {
+            arr[i].forEach((block, j) => {
+                if (arr[i][j] != 0) {
+                    holdBoard[i+1][j+1] = arr[i][j];
+                }
+            });
+        });
 
-		drawHoldPiece();
-	};
+        drawHoldPiece();
+    };
 
-	drawHoldPiece();
+    drawHoldPiece();
 
     const drawGameInfo = () => {
         HTMLgameInfo.textContent = "\n";
 
         HTMLgameInfo.textContent += `Level: ${level}
 Score: ${score}
+HighScore: ${highScore}
 Lines: ${lines}`;
     }
 
-	const draw = () => {
-		updatePiece();
-		updateBoard();
-        drawGameInfo();
-        findGhost();
-	}
+    const music = new Audio();
 
-	const update = () => {
-		let frame = requestAnimationFrame(update);
+    const playMusic = () => {
+        if (HTMLmusicSelect.value != "None" && music.src.indexOf(HTMLmusicSelect.value) == -1 && !stopGame) {
+            music.src = HTMLmusicSelect.value;
 
-		if ((level-1 < speeds.length && frame%speeds[level-1]-1 == 0) || level-1 >= speeds.length) {
-			draw();
-		}
-	};
-
-	document.addEventListener("keydown", function(key) {
-		if (key.keyCode == 37 && isValid("left")) {
-			currentCol--;
-		} else if (key.keyCode == 39 && isValid("right")) {
-			currentCol++;
-		} else if (key.keyCode == 38) {
-			rotatePiece("c");
-		} else if (key.keyCode == 88) {
-			rotatePiece("cc");
-		} else if (key.keyCode == 40) {
-            draw();
-            score += level;
-        } else if (key.keyCode == 16) {
-        	if (canHold) {
-                let length = holdPiece.length;
-
-                let hold = JSON.parse(JSON.stringify(holdPiece));
-                holdPiece = JSON.parse(JSON.stringify(tetrominoes[currentPos]));
-
-                if (length == 0) {
-                    holdPos = currentPos;
-
-                    currentTetromino = holdPiece;
-
-                    currentRow = 0;
-                    currentCol = Math.round((cols-currentTetromino.length)/2);
-
-                    nextPiece();
+            if (music.currentTime == 0) {
+                music.play();
+            }
+        } else if (HTMLmusicSelect.value == "None") {
+            music.pause();
+        } else if (stopGame && music.src.indexOf("Game_Over") == -1 && music.src.indexOf("High_Score") == -1) {
+            if (music.currentTime == 0) {
+                if (score == highScore) {
+                    music.src = "Music/High_Score.mp3";
                 } else {
-                    let temp = currentPos;
-
-                    currentPos = holdPos;
-                    holdPos = temp;
-
-                	currentTetromino = hold;
-
-                    currentRow = 0;
-                    currentCol = Math.round((cols-currentTetromino.length)/2);
+                    music.src = "Music/Game_Over.mp3";
                 }
 
-                updateHoldPiece();
-                findBounds();
-
-                canHold = false;
+                music.play();
+            } else {
+                music.currentTime = 0;
             }
-        } else if (key.keyCode == 90) {
-            findGhost(true);
         }
 
-        clearLine();
-		updateBoard();
+        if (!stopGame) {
+            if (HTMLmusicSelect.value.indexOf("A") > -1 && music.currentTime >= music.duration*0.92083) {
+                music.currentTime = 0;
+            } else if (HTMLmusicSelect.value.indexOf("B") > -1 && music.currentTime >= music.duration*0.88722) {
+                music.currentTime = 0;
+            } else if (HTMLmusicSelect.value.indexOf("C") > -1 && music.currentTime >= music.duration*0.92015) {
+                music.currentTime = 0;
+            } else if (HTMLmusicSelect.value.indexOf("D") > -1 && music.currentTime >= music.duration*0.71677) {
+                music.currentTime = 0;
+            }
+        } else {
+            if (music.src.indexOf("High_Score") > -1 && music.currentTime >= music.duration*0.88895) {
+                music.currentTime = 1.30456;
+            }
+        }
+    }
+
+    const draw = () => {
+        updatePiece();
+        updateBoard();
+
+        if (score > highScore) {
+            highScore = score;
+        }
+
+        drawGameInfo();
         findGhost();
-	});
+    }
+
+    const update = () => {
+        let frame = requestAnimationFrame(update);
+
+        playMusic();
+
+        if (stopGame) {
+            HTMLBoard.innerHTML = "GAME OVER";
+        } else if ((level-1 < speeds.length && frame%speeds[level-1]-1 == 0) || level-1 >= speeds.length) {
+            draw();
+        }
+    };
+
+    document.addEventListener("keydown", function(key) {
+        if (!stopGame) {
+            if (key.keyCode == 37 && isValid("left")) {
+                currentCol--;
+            } else if (key.keyCode == 39 && isValid("right")) {
+                currentCol++;
+            } else if (key.keyCode == 38) {
+                rotatePiece("c");
+            } else if (key.keyCode == 88) {
+                rotatePiece("cc");
+            } else if (key.keyCode == 40) {
+                draw();
+                score += level;
+            } else if (key.keyCode == 16) {
+                if (canHold) {
+                    let length = holdPiece.length;
+
+                    let hold = JSON.parse(JSON.stringify(holdPiece));
+                    holdPiece = JSON.parse(JSON.stringify(tetrominoes[currentPos]));
+
+                    if (length == 0) {
+                        holdPos = currentPos;
+
+                        currentTetromino = holdPiece;
+
+                        currentRow = 0;
+                        currentCol = Math.round((cols-currentTetromino.length)/2);
+
+                        nextPiece();
+                    } else {
+                        let temp = currentPos;
+
+                        currentPos = holdPos;
+                        holdPos = temp;
+
+                        currentTetromino = hold;
+
+                        currentRow = 0;
+                        currentCol = Math.round((cols-currentTetromino.length)/2);
+                    }
+
+                    updateHoldPiece();
+                    findBounds();
+
+                    canHold = false;
+                }
+            } else if (key.keyCode == 90) {
+                findGhost(true);
+            }
+
+            clearLine();
+            updateBoard();
+            findGhost();
+
+            if (score > highScore) {
+                highScore = score;
+            }
+
+            drawGameInfo();
+        }
+    });
 
     HTMLresetButton.onclick = () => {
+        stopGame = false;
+
         board.forEach((row, i, arr) => {
             arr[i].forEach((block, j) => {
                 arr[i][j] = 0;
@@ -988,5 +1063,5 @@ Lines: ${lines}`;
         draw();
     }
 
-	update();
+    update();
 })();
