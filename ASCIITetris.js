@@ -776,9 +776,6 @@
         }
 
         HTMLBoard.innerHTML = HTMLBoard.innerHTML.replace(/\|/g, `<strong>|</strong>`).replace(/@/g, `<strong class="${colors[currentPos]}">@</strong>`);
-
-        //console.clear();
-        //console.log(JSON.parse(JSON.stringify(HTMLBoard.textContent)));
     }
 
     const updateBoard = () => {
