@@ -930,6 +930,7 @@ Lines: ${lines}`;
     const update = () => {
         let frame = requestAnimationFrame(update);
 
+        clearLine();
         playMusic();
 
         if (stopGame) {
