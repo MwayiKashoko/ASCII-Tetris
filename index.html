@@ -8,6 +8,7 @@
 		<style>
 			body {
 				font-family: menlo;
+				text-align: center;
 			}
 
 			#tetrisBoard {
@@ -58,25 +59,29 @@
 	</head>
 
 	<body>
-		<p id="tetrisBoard"></p>
-		<span id="holdPieceBlock"></span>
-		<span id="gameInfo"></span>
-		<br>
-		<label> Show Ghost:<input type="checkbox" checked id="showGhostCheckbox"></label>
-		<br>
-		<button id="resetButton">New Game</button>
+		<span style="display: inline-block; vertical-align: middle; height: 93.6vh;"></span>
 
-		<label for="cars">Music</label>
-
-		<select name="musicSelection" id="musicSelect">
-			<option value="None">None</option>
-		 	<option value="Music/Type_A.mp3">Type A</option>
-		 	<option value="Music/Type_B.mp3">Type B</option>
-		 	<option value="Music/Type_C.mp3">Type C</option>
-		 	<option value="Music/Type_D.mp3">Type D</option>
-		</select> <br> <br>
-
-		<button onclick="alert('Use the left and right arrow keys to move the piece, the up arrow key to rotate the piece right, x to rotate the piece left, the down arrow key to drop the piece down faster, z to instantly drop a piece to the board, and shift to hold a piece to use for later.')">Help</button>
+		<span id="verticallyAlignedHeader" style="display: inline-block; vertical-align: middle;">
+			<p id="tetrisBoard"></p>
+			<span id="holdPieceBlock"></span>
+			<span id="gameInfo"></span>
+			<br>
+			<label> Show Ghost:<input type="checkbox" checked id="showGhostCheckbox"></label>
+			<br>
+			<button id="resetButton">New Game</button>
+	
+			<label for="cars">Music</label>
+	
+			<select name="musicSelection" id="musicSelect">
+				<option value="None">None</option>
+			 	<option value="Music/Type_A.mp3">Type A</option>
+			 	<option value="Music/Type_B.mp3">Type B</option>
+			 	<option value="Music/Type_C.mp3">Type C</option>
+			 	<option value="Music/Type_D.mp3">Type D</option>
+			</select> <br> <br>
+	
+			<button onclick="alert('Use the left and right arrow keys to move the piece, the up arrow key to rotate the piece right, x to rotate the piece left, the down arrow key to drop the piece down faster, z to instantly drop a piece to the board, and shift to hold a piece to use for later.')">Help</button>
+		</span>
 	</body>
 
 	<script src="ASCIITetris.js"></script>
